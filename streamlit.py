@@ -1,7 +1,6 @@
 import mysql.connector
 import pandas as pd
 import streamlit as st
-from datetime import datetime
 
 # Connect to MySQL database
 con = mysql.connector.connect(
