@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver import ActionChains
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
@@ -8,9 +8,11 @@ import time
 from datetime import datetime
 import pandas as pd
 import mysql.connector
-# use pip install webdriver-manager which is needed
+
+# use pip install webdriver-manager also which is needed
 
 # Setup MYSQL connection
+# utilize your preferred database
 con = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -77,14 +79,16 @@ def get_bus_details_for_route(url):
     time.sleep(4)
 
     # Expanding all the buses section if it has 'view buses' button
+    # Adding an exception block if it is unable to click view buses button
     try:
         tourismBusesAgency = driver.find_elements(By.CLASS_NAME, 'gmeta-data.clearfix')
 
         for agency in tourismBusesAgency:
             btn_var = agency.find_element(By.CLASS_NAME, "button")
             btn_var.click()
-    except:
-        print(url,'view-buses not clickable or not available')
+    except ElementClickInterceptedException:
+        print(url, 'view-buses in this url not clickable')
+
     # Scrolling so all the bus data gets loaded
     scroll()
 
@@ -197,8 +201,9 @@ def get_urls(url):
                 url_extracted = url_to_extract.get_attribute('href')
                 #print(url_extracted)
                 routes_urls.append(url_extracted)
-        except:
-            print('not clickable')
+        # Usually the page 1 is not clickable since it is active, so we need to catch the exception
+        except ElementClickInterceptedException:
+            print('the page is not not clickable')
 
 
 list_of_state_tourism_url = ['https://www.redbus.in/online-booking/apsrtc/?utm_source=rtchometile',
