@@ -39,8 +39,8 @@ query = """CREATE TABLE if not exists bus_routes (
 cursor.execute(query)
 
 # Truncate Table
-query = "TRUNCATE TABLE bus_routes"
-cursor.execute(query)
+#query = "TRUNCATE TABLE bus_routes"
+#cursor.execute(query)
 
 
 # Function to scroll to end of page to get all buses
@@ -49,7 +49,7 @@ def scroll():
 
     while True:
 
-        # Scroll down to the bottom
+        # Scroll down to the bottom in order to load all the buses
 
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
@@ -61,6 +61,7 @@ def scroll():
 
         new_height = driver.execute_script("return document.body.scrollHeight")
 
+        # If it is the same height then it is at the end of the page
         if new_height == last_height:
             break
 
@@ -163,13 +164,13 @@ def write_into_db(df):
         row_data = list(df.loc[index].values)
         result.append(row_data)
     cursor.executemany(query,
-                       result)  # execute many and storing data in list as it connects to the db once it finishes getting input rather than each time
+                       result)  # execute many and storing data in list as it connects to the db once it finishes
+    # getting input rather than each time
     con.commit()
 
 
 # A list to store all the route urls for each state transportation
 routes_urls = []
-
 
 # Function to get all the routes url for the selected state transportation
 def get_urls(url):

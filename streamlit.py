@@ -32,6 +32,16 @@ st.sidebar.title('Filters')
 route_names = df['route_name'].unique().tolist()
 route_name = st.sidebar.selectbox('Select Route Name', ['', *route_names])
 
+#Unique Bus tourisms
+tc_ending_names=[]
+for busname in df['busname']:
+    busname_split=busname.split(' - ')[0]
+    if busname_split.endswith('TC'):
+        if busname_split not in tc_ending_names:
+            tc_ending_names.append(busname_split)
+bus_tourism = st.sidebar.selectbox('Select Tourism Name', ['', *tc_ending_names, 'Private'])
+
+
 # Bus types
 bus_types = ['AC', 'Non AC', 'Others']
 bus_type = st.sidebar.selectbox('Select Bus Type', ['', *bus_types])
@@ -67,6 +77,12 @@ query = "SELECT * FROM bus_routes WHERE 1=1"
 # Apply filters based on user selections
 if route_name:
     query += f" AND route_name = '{route_name}'"
+
+if bus_tourism:
+    if bus_tourism != 'Private':
+        query += f" AND busname like '%{bus_tourism}%'"
+    elif bus_tourism == 'Private':
+        query += f" AND busname NOT LIKE '%-%'"
 
 if bus_type == 'AC':
     query += " AND (bustype REGEXP 'AC|A.C|A/C') AND (bustype NOT REGEXP 'Non AC|Non A/C|Non A.C|NON-AC')"
